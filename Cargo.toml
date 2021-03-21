@@ -1,0 +1,15 @@
+[package]
+name = "web_server"
+version = "0.1.0"
+authors = ["DONGEUN-LEE <adsl2109@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+diesel = { version = "1.4.6", features = ["postgres"] }
+dotenv = "0.15.0"
+actix-web = "2.0"
+actix-rt = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
