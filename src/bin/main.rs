@@ -21,12 +21,12 @@ async fn index3() -> impl Responder {
 
 #[get("/plan")]
 async fn plan() -> impl Responder {
-    use web_server::schema::posts::dsl::*;
+    use web_server::schema::plans::dsl::*;
 
     let connection = establish_connection();
-    let results = posts
-        .load::<Post>(&connection)
-        .expect("Error loading posts");
+    let results = plans
+        .load::<Plan>(&connection)
+        .expect("Error loading plans");
 
     let xs = serde_json::to_string(&results).unwrap();
 
