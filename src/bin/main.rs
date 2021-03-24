@@ -19,7 +19,7 @@ async fn index3() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
 }
 
-#[get("/plan")]
+#[get("/api/plan")]
 async fn plan() -> impl Responder {
     use web_server::schema::plans::dsl::*;
 
