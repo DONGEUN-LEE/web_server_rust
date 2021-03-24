@@ -34,16 +34,25 @@ pub struct Post {
 }
 
 #[derive(Queryable, Serialize, Deserialize)]
+#[allow(non_snake_case)]
 pub struct Plan {
     pub id: i32,
-    pub site_id: String,
-    pub stage_id: String,
-    pub oper_id: String,
-    pub resource_id: String,
-    pub product_id: String,
-    pub plan_qty: BigDecimal,
+    #[column_name = "site_id"]
+    pub siteId: String,
+    #[column_name = "stage_id"]
+    pub stageId: String,
+    #[column_name = "oper_id"]
+    pub operId: String,
+    #[column_name = "resource_id"]
+    pub resourceId: String,
+    #[column_name = "product_id"]
+    pub productId: String,
+    #[column_name = "plan_qty"]
+    pub planQty: BigDecimal,
+    #[column_name = "start_time"]
     #[serde(with = "json_time")]
-    pub start_time: NaiveDateTime,
+    pub startTime: NaiveDateTime,
+    #[column_name = "end_time"]
     #[serde(with = "json_time")]
-    pub end_time: NaiveDateTime,
+    pub endTime: NaiveDateTime,
 }
