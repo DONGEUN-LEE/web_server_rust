@@ -56,3 +56,10 @@ pub struct Plan {
     #[serde(with = "json_time")]
     pub endTime: NaiveDateTime,
 }
+
+#[derive(Queryable, Serialize, Deserialize)]
+#[allow(non_snake_case)]
+pub struct User {
+    pub email: String,
+    pub password: String,
+}
