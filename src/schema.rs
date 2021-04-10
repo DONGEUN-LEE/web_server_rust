@@ -34,8 +34,16 @@ table! {
     }
 }
 
+table! {
+    users (email) {
+        email -> Varchar,
+        password -> Varchar,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     posts,
     plans,
     products,
+    users,
 );

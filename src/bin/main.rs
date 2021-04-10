@@ -1,4 +1,5 @@
 extern crate diesel;
+extern crate bcrypt;
 extern crate web_server;
 
 use self::diesel::prelude::*;
@@ -7,6 +8,7 @@ use self::web_server::*;
 use serde::{Serialize, Deserialize};
 use actix_web::{error, post, get, web, App, Error, HttpResponse, HttpServer, Responder};
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use bcrypt::{DEFAULT_COST, hash, verify};
 use futures::StreamExt;
 use dotenv::dotenv;
 use std::env;
@@ -31,7 +33,8 @@ struct LoginReq {
 
 #[derive(Serialize, Deserialize)]
 struct LoginRes {
-    pub token: String,
+    pub token: Option<String>,
+    pub message: Option<String>,
 }
 
 async fn index() -> impl Responder {
@@ -78,12 +81,28 @@ async fn login(mut payload: web::Payload) -> Result<HttpResponse, Error> {
 
     let req = serde_json::from_slice::<LoginReq>(&body)?;
 
-    let claims = Claims { sub: req.email.to_owned(), exp: 10000000000 };
+    use web_server::schema::users::dsl::*;
 
-    let secret_key = env::var("SECRET_KEY").expect("SECRET_KEY must be set");
-    let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(secret_key.as_ref())).expect("Failed to encode claims");
+    let connection = establish_connection();
+    let user = users
+        .filter(email.eq(req.email.to_owned()))
+        .first::<User>(&connection)
+        .expect("Error loading users");
 
-    let res = LoginRes { token: token };
+    // let hashed = hash(req.password.to_owned(), DEFAULT_COST).expect("Failed to hash password");
+    let mut res = LoginRes { token: None, message: None };
+    if verify(&req.password, &user.password).expect("Failed to verify password") {
+        let claims = Claims { sub: req.email.to_owned(), exp: 10000000000 };
+
+        let secret_key = env::var("SECRET_KEY").expect("SECRET_KEY must be set");
+        let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(secret_key.as_ref())).expect("Failed to encode claims");
+
+        res.token = Some(token);
+        res.message = Some("Success".to_string());
+    } else {
+        res.message = Some("Fail".to_string());
+    }
+
     let xs = serde_json::to_string(&res).unwrap();
     Ok(HttpResponse::Ok().body(xs))
 }
